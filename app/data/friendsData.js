@@ -5,18 +5,26 @@
 // But you could have it be an empty array as well.
 // ===============================================================================
 
-var NUM_QUESTIONS = 3;
-
 var friendsArray = [
   {
     "name":"George",
     "photo":"photo",
-    "scores":[5,4,2]
+    "scores":[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]
   },
   {
     "name":"Abraham",
     "photo":"photo",
-    "scores":[1,4,5]
+    "scores":[5, 4, 3, 2, 1, 5, 4, 3, 2, 1]
+  },
+  {
+    "name":"Nancy",
+    "photo":"photo",
+    "scores":[5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+  },
+  {
+    "name":"Lisa",
+    "photo":"photo",
+    "scores":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
   }
 ];
 

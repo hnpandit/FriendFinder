@@ -25,33 +25,37 @@ module.exports = function(app) {
   // Below code handles when a user submits a form and thus submits data to the server.
   // In each of the below cases, when a user submits form data (a JSON object)
   // ...the JSON is pushed to the appropriate JavaScript array
-  // (ex. User fills out a reservation request... this data is then sent to the server...
-  // Then the server saves the data to the tableData array)
   // ---------------------------------------------------------------------------
 
-  app.post("/api/friends", function(req, res) {
-    // Note the code here. Our "server" will respond to requests and let users know if they have a table or not.
-    // It will do this by sending out the value "true" have a table
-    // req.body is available since we're using the body parsing middleware
-    if (tableData.length < 5) {
-      tableData.push(req.body);
-      res.json(true);
+  app.post("/api/friends", function(req, res) 
+  {
+    var i=0;
+    var j=0;
+    var strBestFriend;
+    var bestScore=40;
+    var totalScore=0;
+
+    // Let's add you as one of the friends
+    friendsData.push(req.body);
+
+    // This is where I am putting logic to find best compatible friend
+    for (i=0; i<friendsData.length-1; i++)
+    {
+      totalScore = 0;
+      for (j=0; j<friendsData[i].scores.length; j++)
+      {
+        totalScore = totalScore + Math.abs(friendsData[friendsData.length-1].scores[j] - friendsData[i].scores[j])
+      }
+      
+      if (totalScore < bestScore)
+      {
+          bestScore = totalScore;
+          strBestFriend = friendsData[i].name;
+      }
+      console.log("best friend " + strBestFriend);
+      console.log("best score " + bestScore);
+      console.log("total score " + totalScore);
     }
-    else {
-      waitListData.push(req.body);
-      res.json(false);
-    }
-  });
-
-  // ---------------------------------------------------------------------------
-  // I added this below code so you could clear out the table while working with the functionality.
-  // Don"t worry about it!
-
-  app.post("/api/clear", function(req, res) {
-    // Empty out the arrays of data
-    tableData.length = [];
-    waitListData.length = [];
-
-    res.json({ ok: true });
+    res.json(strBestFriend);
   });
 };

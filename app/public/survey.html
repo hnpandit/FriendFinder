@@ -39,21 +39,25 @@
           <div class="card-body">
             <form role="form">
               <div class="form-group">
+                
                 <label for="name">Name (Required)</label>
                 <input type="text" class="form-control" id="name">
+                
                 <label for="photo">Link to Photo Image (Required)</label>
                 <input type="text" class="form-control" id="photo">
-                <label for="question">Question 1 of 10</label>
-                <input type="label" class="form-control" id="question">
+                
+                <br>
+                <label for="question" id="lblQuestion">Question 1 of 10</label>
+                <br>
                 <label for="response">Response</label>
                 <br>
-                <label class="radio-inline"><input type="radio" name="optradio"> Strongly Disagree </label>
-                <label class="radio-inline"><input type="radio" name="optradio"> Disagree </label>
-                <label class="radio-inline"><input type="radio" name="optradio"> Neither </label>
-                <label class="radio-inline"><input type="radio" name="optradio"> Agree </label>
-                <label class="radio-inline"><input type="radio" name="optradio"> Strongly Agree </label>
+                <label class="radio-inline"><input type="radio" name="response" value="1"> Strongly Disagree </label>
+                <label class="radio-inline"><input type="radio" name="response" value="2"> Disagree </label>
+                <label class="radio-inline"><input type="radio" name="response" checked value="3"> Neither </label>
+                <label class="radio-inline"><input type="radio" name="response" value="4"> Agree </label>
+                <label class="radio-inline"><input type="radio" name="response" value="5"> Strongly Agree </label>
               </div>
-              <button type="submit" class="btn btn-primary submit">Next Question</button>
+              <button type="button" id="myButton" class="btn btn-primary submit">Next Question</button>
             </form>
           </div>
         </div>
@@ -68,50 +72,77 @@
 
 <!-- BELOW CODE IS CRITICAL. IT HANDLES HOW FORM DATA IS SENT TO OUR SERVER -->
 <script type="text/javascript">
-  // In this code below we create the Front-end JavaScript which "POSTS" our form data to our express server.
-  // In essence, when the user hits submit, jQuery grabs all of the fields then sends a post request to our api
-  // Our api recognizes the route (/api/tables)... and then runs the associated code (found in api-routes.js).
-  // In this case the associated code "saves" the data to the table-data.js file or waitinglist-data.js file
 
-  $(".submit").on("click", function(event) {
-    event.preventDefault();
+  var MAX_QUESTIONS = 10;
+  var count = 0;
+  var newFriend;
+  var strQuestion;
+  var questionBank = [];
 
-    // Here we grab the form elements
-    var newReservation = {
-      customerName: $("#reserve-name").val().trim(),
-      phoneNumber: $("#reserve-phone").val().trim(),
-      customerEmail: $("#reserve-email").val().trim(),
-      customerID: $("#reserve-unique-id").val().trim()
-    };
+  questionBank.push(" I value education");
+  questionBank.push(" I love music");
+  questionBank.push(" I am an outdoor person");
+  questionBank.push(" I am travelling");
+  questionBank.push(" I like eating outside");
+  questionBank.push(" I am religious");
+  questionBank.push(" I like shopping");
+  questionBank.push(" I like to make more money");
+  questionBank.push(" I like to help others");
+  questionBank.push(" I like to watch and play sports");
 
-    console.log(newReservation);
+  // Here we grab the form elements
+  var newFriend = {
+      name: "name",
+      photo: "photo",
+      scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   };
 
-    // This line is the magic. It"s very similar to the standard ajax function we used.
-    // Essentially we give it a URL, we give it the object we want to send, then we have a "callback".
-    // The callback is the response of the server. In our case, we set up code in api-routes that "returns" true or false
-    // depending on if a tables is available or not.
+  function askQuestion()
+  {
+    count++;
+    strQuestion = "Question " + count + " of " + MAX_QUESTIONS + ": " + questionBank[count-1];
+    $("#lblQuestion").text(strQuestion);
+    $('input[name="response"]').prop('checked', false);
+  }
 
-    $.post("/api/tables", newReservation,
-      function(data) {
+  function startSurvey()
+  {
+    askQuestion();
+  }
 
-        // If a table is available... tell user they are booked.
-        if (data) {
-          alert("Yay! You are officially booked!");
-        }
-
-        // If a table is available... tell user they on the waiting list.
-        else {
-          alert("Sorry you are on the wait list");
-        }
-
-        // Clear the form when submitting
-        $("#reserve-name").val("");
-        $("#reserve-phone").val("");
-        $("#reserve-email").val("");
-        $("#reserve-unique-id").val("");
-
-      });
-
+  $(".radio-inline").on("click", function(event) {  
+    newFriend.scores[count-1] = $('input[name=response]:checked').val();
   });
+
+  $("#myButton").on("click", function(event) {  
+  
+    if (count < MAX_QUESTIONS)
+    {
+      event.preventDefault();
+      askQuestion();
+      if (count == MAX_QUESTIONS)
+      {
+        $("#myButton").text("Submit");
+      }
+    }
+    else
+    {
+      console.log("Finding your friend...");
+
+      newFriend.name = $("#name").val().trim();
+      newFriend.photo = $("#photo").val().trim();
+
+      $.post("/api/friends", newFriend, function(data) 
+      {
+        // We always want new friends
+        if (data) {
+          alert("Your best friend is " + data);
+          return;
+        }
+      });
+    }
+  });
+
+startSurvey();
 
 </script>
